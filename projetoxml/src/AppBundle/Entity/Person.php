@@ -106,6 +106,5 @@ class Person
     public function getPhones()
     {
         return $this->phones;
-    }
-
+    }    
 }

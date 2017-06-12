@@ -1,6 +1,4 @@
 <?php
-
-// src/AppBundle/Controller/LuckyController.php
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Item;
@@ -147,6 +145,7 @@ class UploadController extends Controller
 			$em->persist($shiporder);	
 		$em->flush();	
 		$this->shiporders = array();
-	}		
+	}	
+	 	
 }
 
