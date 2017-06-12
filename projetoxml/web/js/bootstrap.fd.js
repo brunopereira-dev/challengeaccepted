@@ -203,10 +203,10 @@ $.FileDialog.defaults = {
     "dropheight": 400,
     "error_message": "Ocorreu um erro durante o carregamento do arquivo.",
     "multiple": true,
-    "ok_button": "OK",
+    "ok_button": "Upload",
     "readAs": "DataURL", /* possible choices: BinaryString, Text, DataURL, ArrayBuffer, */
     "remove_message": "Remove&nbsp;file",
-    "title": "Load file(s)"
+    "title": "Carregar arquivo(s)"
 };
 
 })(jQuery);

@@ -2,20 +2,104 @@
 {# app/Resources/views/lucky/number.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Your lucky number is {{ number }}</h1>
-
+{% block body %} 
     {% block content %}
-        <script src="{{ asset('js/views/upload.js') }}"></script>  
-   
+        <script src="{{ asset('js/views/upload.js') }}"></script>          
         <div class="row-fluid">
             <div class="fileupload fileupload-new" data-provides="fileupload">
                 <div class="input-append">
                     <form class="form" method ="POST" id="formUpload" enctype="multipart/form-data">
                         <div class="container">
-                            <h2>Click blue button</h2>
-                            <button type="button" id="open_btn" class="btn btn-primary">Open dialog</button>
-                            <div id="output"></div>
+                            <div class="jumbotron">
+                                <h1>Challenge Accepted</h1>
+                                <p>Desafio desenvolvido para S2 IT.</p>                                
+                            </div>
+                            <div class="well">
+                                <p>Utilize o botão ao lado para fazer upload dos arquivos.
+                                <button style="float:right" type="button" id="open_btn" class="btn btn-primary">Abrir caixa de Upload</button></p>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                    {% if sucesso %}                                    
+                                        <div class="alert alert-success">
+                                            <strong>{{message}}</strong>
+                                        </div>
+                                    {% elseif message is defined %} 
+                                        <div class="alert alert-danger">                                            
+                                            {{message}}                                            
+                                        </div>
+                                    {% endif %} 
+                                    <div class="alert alert-danger" id="mensagens" style="display:none;"></div>                                                                      
+                                </div> 
+                            </div> 
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Shiporders Table</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-lg-12">                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Addres</th>
+                                                        <th>Person</th>
+                                                        <th>Items (Name - Quantity - Price) </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for ship in ships %}
+                                                        <tr>
+                                                            <td>{{ ship.getShiptoname() }}</td>
+                                                            <td>{{ ship.getShiptoaddress() }} - {{ ship.getShiptocity() }} - {{ ship.getShiptocountry() }}</td>
+                                                            <td>{{ ship.getPerson().getName() }}</td>
+                                                            <td>
+                                                                {% for item in ship.getItens() %}
+                                                                    {{ item.getTitle() }} - {{ item.getQuantity() }} - ${{ item.getPrice() }}<br/>
+                                                                {% endfor %}
+                                                            </td>
+                                                        </tr>                                                        
+                                                    {% endfor %}                           
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>                                   
+                                </div>
+                            </div>                            
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">People Table</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-lg-12">                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Phones</th>                                                        
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for per in person %}
+                                                        <tr>
+                                                            <td>{{ per.getName() }}</td>                                                            
+                                                            <td>
+                                                                {% for phone in per.getPhones() %}
+                                                                    {{ phone.getNumber() }}<br/>
+                                                                {% endfor %}
+                                                            </td>
+                                                        </tr>                                                        
+                                                    {% endfor %}                                          
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>                                   
+                                </div>
+                            </div> 
                         </div>                                        
                     </form>
                 </div>

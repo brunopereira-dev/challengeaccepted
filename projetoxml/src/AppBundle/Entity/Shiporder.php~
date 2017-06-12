@@ -1,0 +1,54 @@
+<?php
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="shiporder")
+ */
+class Shiporder
+{   
+    /**
+    * @ORM\ManyToOne(targetEntity="Person", cascade={"all"})
+    * @ORM\JoinColumn(name="person_id", referencedColumnName="id", nullable=FALSE)
+    */
+    private $person;
+
+    /**
+    * @ORM\ManyToMany(targetEntity="Item", cascade={"all"})
+    */
+    private $itens;
+   
+    public function __construct()
+    {
+        $this->itens = new ArrayCollection();
+    }
+
+    /**
+    * @ORM\Column(type="integer")
+    * @ORM\Id    
+    */
+    private $id;
+
+    /**
+    * @ORM\Column(type="string", length=200)
+    */
+    private $shiptoname;
+
+    /**
+    * @ORM\Column(type="string", length=500)
+    */
+    private $shiptoaddress;
+
+    /**
+    * @ORM\Column(type="string", length=100)
+    */
+    private $shiptocity;
+
+    /**
+    * @ORM\Column(type="string", length=50)
+    */
+    private $shiptocountry;
+}

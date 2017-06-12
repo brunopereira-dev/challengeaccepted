@@ -9,10 +9,10 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="person")
  */
 class Person
-{
+{   
     /**
-     * @ORM\OneToMany(targetEntity="Phone", mappedBy="person")
-     */
+    * @ORM\ManyToMany(targetEntity="Phone", cascade={"all"})
+    */
     private $phones;
 
     public function __construct()
@@ -31,8 +31,18 @@ class Person
     */
     private $name;
 
+    /**
+     * Set id
+     *
+     * @param integer $id
+     * @return Person
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
 
-
+        return $this;
+    }
     /**
      * Get id
      *
@@ -73,12 +83,11 @@ class Person
      * @return Person
      */
     public function addPhone(\AppBundle\Entity\Phone $phones)
-    {
-        $this->phones[] = $phones;
-
+    {        
+        $this->phones[] = $phones;                
         return $this;
     }
-
+    
     /**
      * Remove phones
      *
@@ -98,4 +107,5 @@ class Person
     {
         return $this->phones;
     }
+
 }

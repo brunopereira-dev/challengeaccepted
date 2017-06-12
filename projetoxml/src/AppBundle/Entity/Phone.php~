@@ -10,12 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Phone
 {
     /**
-     * @ORM\ManyToOne(targetEntity="Person", inversedBy="phones")
-     * @ORM\JoinColumn(name="person_id", referencedColumnName="id")
-     */
-    private $person;
-
-    /**
     * @ORM\Column(type="integer")
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="AUTO")
@@ -58,28 +52,5 @@ class Phone
     public function getNumber()
     {
         return $this->number;
-    }
-
-    /**
-     * Set person
-     *
-     * @param \AppBundle\Entity\Person $person
-     * @return Phone
-     */
-    public function setPerson(\AppBundle\Entity\Person $person = null)
-    {
-        $this->person = $person;
-
-        return $this;
-    }
-
-    /**
-     * Get person
-     *
-     * @return \AppBundle\Entity\Person 
-     */
-    public function getPerson()
-    {
-        return $this->person;
     }
 }

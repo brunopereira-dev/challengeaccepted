@@ -6,6 +6,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Item;
 use AppBundle\Entity\Person;
 use AppBundle\Entity\Phone;
+use AppBundle\Entity\Shiporder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,60 +16,71 @@ class UploadController extends Controller
 {  
 	private $people = array();
 	private $shiporders = array();
-
+    private $message = "";
+	private $sucesso = false;
 	/**
 	 * @Route("/upload/xml")
 	 */
 	public function xmlUploadAction(Request $request)
 	{	
+		$this->message = "";
 		if ($request->getMethod() == 'POST') 
 		{
-			$arquivos = $_POST['arquivo'];
-			foreach($arquivos as $arq)							
-				$this->convertXmlToObjetc(base64_decode($arq));	
-			$this->persistirPeople();			
-			
+			try{
+				$arquivos = $_POST['arquivo'];					
+				$this->persistirXml($arquivos);	
+				
+				if($this->message == "")					
+					$this->message = 'Arquivo(s) importado(s) com sucesso!';
+				
+			} catch (\Exception $e){				
+				$this->message = 'Ocorreu um erro na inserção dos dados.					 
+								  Verifique se esse arquivo já foi importado ou depende da inclusão de outro arquivo.';
+				$this->sucesso = false;						
+			}		
+		} 
 		
-		} else {
-			echo 'não foi post';
-		}
-		
-		return $this->render('xml/xml.html.twig', array(
-			'number' => "Registro salvo com o id"
-		));
+		$ships = $this->getDoctrine()->getRepository('AppBundle:Shiporder')->findAll();
+		$person = $this->getDoctrine()->getRepository('AppBundle:Person')->findAll();
+
+		$parametro = array('sucesso' => $this->sucesso, 'ships' => $ships, 'person' => $person);
+		if($this->message != "")
+			$parametro['message'] = $this->message;
+
+		return $this->render('xml/xml.html.twig', $parametro);
 	}
 
-	private function persistirPeople()
-	{
-		$em = $this->getDoctrine()->getManager();
-		foreach ($this->people as $people) 				
-			$em->persist($people);	
-		$em->flush();	
-		$this->people = array();
-	}
+	private function persistirXml($arquivos)
+	{	  	
+		$listaShipOrderXml = array();
+		$listaPersonXml = array();
 
-	private function convertXmlToObjetc($stringXml)
-	{
-		try{        			
-			$xml = simplexml_load_string($stringXml, 'SimpleXMLElement');
-			if($xml != null)
+		foreach($arquivos as $arq){			
+			$xml = @simplexml_load_string(base64_decode($arq), 'SimpleXMLElement');
+			if($xml != null && $xml != "")
 			{
 				if(property_exists($xml, 'shiporder'))
-					$this->shiporders[] = $this->prepararShiporder($xml);
+					array_push($listaShipOrderXml, $xml);
 				else if(property_exists($xml, 'person'))
-					$this->prepararPerson($xml);
-			}			
-		}catch (\Exception $e){
-			echo 'Deu erro';
-		}		
-	}
-	
-	private function prepararShiporder($objXml)
-	{   		   
-		foreach($objXml as $ship)
-		{
+					array_push($listaPersonXml, $xml);	
+			} else {
+				$this->message = 'Ocorreu um erro na leitura do(s) arquivo(s). Por favor verifique se o(s) arquivo(s) está(ão) no formato correto e tente novamente.';
+				$this->sucesso = false;
+				break;
+			}	
+		}							
 
-		}	
+		if($this->message == ""){	
+			foreach($listaPersonXml as $objXml){
+				$this->prepararPerson($objXml);
+			}
+			$this->persistirPerson();
+
+			foreach($listaShipOrderXml as $objXml){
+				$this->prepararShiporder($objXml);
+			}
+			$this->persistirShiporders();
+		}
 	}
 
 	private function prepararPerson($objXml)
@@ -90,5 +102,51 @@ class UploadController extends Controller
 			array_push($this->people, $person);			
 		}		
 	}	
+	private function persistirPerson()
+	{
+		$em = $this->getDoctrine()->getManager();
+		foreach ($this->people as $people) 				
+			$em->persist($people);	
+		$em->flush();	
+		$this->people = array();
+	}
+
+	private function prepararShiporder($objXml)
+	{   
+		foreach($objXml as $shipXml)
+		{			
+			$shiporder = new Shiporder();
+			$shiporder->setId($shipXml->orderid);
+			$shiporder->setShiptoname($shipXml->shipto->name);
+			$shiporder->setShiptoaddress($shipXml->shipto->address);
+			$shiporder->setShiptocity($shipXml->shipto->city);
+			$shiporder->setShiptocountry($shipXml->shipto->country);
+			
+			$person = $this->getDoctrine()->getRepository('AppBundle:Person')->find($shipXml->orderperson);			
+			$shiporder->setPerson($person);
+			
+			foreach($shipXml->items as $items)
+			{	
+				foreach($items as $item)
+				{								
+					$itemTemp = new Item();
+					$itemTemp->setTitle($item->title);
+					$itemTemp->setNote($item->note);
+					$itemTemp->setQuantity($item->quantity);
+					$itemTemp->setPrice($item->price);					
+					$shiporder->addIten($itemTemp);	
+				}															
+			}	
+			array_push($this->shiporders, $shiporder);			
+		}			
+	}
+	private function persistirShiporders()
+	{
+		$em = $this->getDoctrine()->getManager();		
+		foreach ($this->shiporders as $shiporder) 				
+			$em->persist($shiporder);	
+		$em->flush();	
+		$this->shiporders = array();
+	}		
 }
 
