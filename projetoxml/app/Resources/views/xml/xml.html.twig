@@ -1,4 +1,26 @@
 
 {# app/Resources/views/lucky/number.html.twig #}
+{% extends 'base.html.twig' %}
 
-<h1>Your lucky number is {{ number }}</h1>
+{% block body %}
+    <h1>Your lucky number is {{ number }}</h1>
+
+    {% block content %}
+        <script src="{{ asset('js/views/upload.js') }}"></script>  
+   
+        <div class="row-fluid">
+            <div class="fileupload fileupload-new" data-provides="fileupload">
+                <div class="input-append">
+                    <form class="form" method ="POST" id="formUpload" enctype="multipart/form-data">
+                        <div class="container">
+                            <h2>Click blue button</h2>
+                            <button type="button" id="open_btn" class="btn btn-primary">Open dialog</button>
+                            <div id="output"></div>
+                        </div>                                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
+
